@@ -14,8 +14,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+# sshd keeps the first value it reads, so the drop-in must sort before others such as 50-cloud-init.conf.
 DEFAULT_CONFIG = Path("C:/ProgramData/ssh/sshd_config") if os.name == "nt" else Path("/etc/ssh/sshd_config")
-DEFAULT_DROPIN = Path("C:/ProgramData/ssh/sshd_config.d/99-dispersal-wolves.conf") if os.name == "nt" else Path("/etc/ssh/sshd_config.d/99-dispersal-wolves.conf")
+DEFAULT_DROPIN = Path("C:/ProgramData/ssh/sshd_config.d/00-dispersal-wolves.conf") if os.name == "nt" else Path("/etc/ssh/sshd_config.d/00-dispersal-wolves.conf")
 
 POLICY = {
     "permitrootlogin": ("no", "Root login should be disabled."),
