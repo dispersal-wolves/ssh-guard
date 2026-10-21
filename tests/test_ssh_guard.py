@@ -18,6 +18,15 @@ class SshGuardTests(unittest.TestCase):
             config.write_text("PermitRootLogin\tno\nPasswordAuthentication=no\nX11Forwarding = no\n", encoding="utf-8")
             self.assertEqual(parse_config(config), {"permitrootlogin": "no", "passwordauthentication": "no", "x11forwarding": "no"})
 
+    def test_include_reads_every_listed_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "a.conf").write_text("PermitRootLogin no\n", encoding="utf-8")
+            (root / "b.conf").write_text("PasswordAuthentication no\n", encoding="utf-8")
+            config = root / "sshd_config"
+            config.write_text("Include a.conf b.conf\n", encoding="utf-8")
+            self.assertEqual(parse_config(config), {"permitrootlogin": "no", "passwordauthentication": "no"})
+
     def test_effective_output_and_audit(self):
         settings = parse_effective_output("permitrootlogin no\npasswordauthentication no\nmaxauthtries 3\n")
         findings = {item.key: item for item in audit(settings)}
