@@ -71,12 +71,14 @@ def parse_config(path: Path, visited: set[Path] | None = None) -> dict[str, str]
         if normalized == "match":
             break
         if normalized == "include":
-            pattern = Path(value.strip())
-            if not pattern.is_absolute():
-                pattern = path.parent / pattern
-            for included in sorted(pattern.parent.glob(pattern.name)):
-                for child_key, child_value in parse_config(included, visited).items():
-                    settings.setdefault(child_key, child_value)
+            # One Include line may list several space-separated paths, read in order.
+            for item in value.split():
+                pattern = Path(item)
+                if not pattern.is_absolute():
+                    pattern = path.parent / pattern
+                for included in sorted(pattern.parent.glob(pattern.name)):
+                    for child_key, child_value in parse_config(included, visited).items():
+                        settings.setdefault(child_key, child_value)
             continue
         settings.setdefault(normalized, value.strip().lower())
     return settings
