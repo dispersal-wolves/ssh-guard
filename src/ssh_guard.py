@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -63,7 +64,9 @@ def parse_config(path: Path, visited: set[Path] | None = None) -> dict[str, str]
         line = raw.split("#", 1)[0].strip()
         if not line:
             continue
-        key, _, value = line.partition(" ")
+        # sshd accepts whitespace or a single "=" between keyword and value.
+        key, *rest = re.split(r"\s*=\s*|\s+", line, maxsplit=1)
+        value = rest[0] if rest else ""
         normalized = key.lower()
         if normalized == "match":
             break
